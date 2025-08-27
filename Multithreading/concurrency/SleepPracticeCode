@@ -1,0 +1,84 @@
+1. Thread.sleep क्या करता है?
+
+Thread.sleep() का काम होता है current thread को कुछ समय के लिए रोक देना (pause करना) ताकि:
+
+Processor को बाकी threads या programs को चलाने का मौका मिले.
+
+Program में delay डालकर output को paced तरीके से दिखाया जा सके.
+
+2. Important Points
+
+Sleep के दो versions हैं:
+
+Milliseconds वाला → Thread.sleep(4000); → 4 seconds का delay.
+
+Nanoseconds वाला → ज़्यादातर rarely use होता है.
+
+Delay exact नहीं होता क्योंकि ये OS scheduling पर depend करता है.
+
+अगर कोई दूसरा thread interrupt कर दे, तो InterruptedException आएगा.
+
+3. Example को समझो
+
+मान लो हम कोई message 4 second के gap में print करना चाहते हैं:
+
+public class SleepMessages {
+    public static void main(String args[]) throws InterruptedException {
+        String importantInfo[] = {
+            "Mares eat oats",
+            "Does eat oats",
+            "Little lambs eat ivy",
+            "A kid will eat ivy too"
+        };
+
+        for (int i = 0; i < importantInfo.length; i++) {
+            // 4 second का pause
+            Thread.sleep(4000);
+
+            // message print करो
+            System.out.println(importantInfo[i]);
+        }
+    }
+}
+
+4. Output (हर 4 second बाद)
+Mares eat oats
+Does eat oats
+Little lambs eat ivy
+A kid will eat ivy too
+
+5. Why throws InterruptedException?
+
+अगर कोई दूसरा thread, current thread को interrupt करता है जब वो सो रहा है, तो InterruptedException throw होगा।
+इसलिए या तो:
+
+Method में throws InterruptedException लिखो, या
+
+try-catch block में handle करो।
+
+Example with try-catch:
+
+try {
+    Thread.sleep(4000);
+} catch (InterruptedException e) {
+    System.out.println("Thread was interrupted!");
+}
+
+6. Real-life example समझो
+
+Scenario: Online food delivery
+
+App हर 5 second में order status check करती है.
+
+Check करने के बीच app Thread.sleep(5000); करके pause करती है ताकि server पर load कम हो.
+
+Scenario: Traffic light system
+
+हर signal के बीच delay चाहिए, जो sleep से किया जा सकता है.
+
+Key Points for Teaching
+Concept	Easy Way to Teach	Example
+Why use sleep	Thread को थोड़ी देर रुकवाना ताकि system balance रहे.	Order status polling, animation delay
+How to write	Simple syntax explain करो.	Thread.sleep(2000);
+Exception	InterruptedException क्यों आता है, simple example से दिखाओ.	दूसरे thread से interrupt करवाकर demo.
+Practical use	Real life analogy दो.	Traffic lights, retry logic, API polling
