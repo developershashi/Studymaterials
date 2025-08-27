@@ -1,0 +1,91 @@
+. Join Method Kya Hai?
+
+join() method ka use ek thread ko dusre thread ka kaam complete hone ka wait karane ke liye hota hai.
+Matlab, agar Thread A ko Thread B ka wait karna hai, toh hum B.join() likhenge. Tab tak Thread A ruk jayega jab tak Thread B khatam nahi ho jata.
+
+2. Syntax
+threadName.join();              // waits until thread finishes
+threadName.join(milliseconds);  // waits for given time or until thread finishes
+
+3. Real Life Example
+
+Socho ki aap khana bana rahe ho:
+
+Sabzi katni hai (Thread 1)
+
+Gas pe pakani hai (Thread 2)
+
+Par roti tab tak nahi banegi jab tak sabzi nahi ban jaati. (Thread 3 waits for Thread 2)
+
+join() kaam yahi karta hai — ek thread dusre ka kaam complete hone ka wait karega.
+
+4. Practical Example
+class MyThread extends Thread {
+    private String taskName;
+
+    public MyThread(String taskName) {
+        this.taskName = taskName;
+    }
+
+    @Override
+    public void run() {
+        try {
+            for (int i = 1; i <= 5; i++) {
+                System.out.println(taskName + " - step " + i);
+                Thread.sleep(1000); // har step ke beech 1 second ka gap
+            }
+            System.out.println(taskName + " completed!");
+        } catch (InterruptedException e) {
+            System.out.println(taskName + " interrupted.");
+        }
+    }
+}
+
+public class JoinExample {
+    public static void main(String[] args) throws InterruptedException {
+        MyThread thread1 = new MyThread("Thread 1 - Data Loading");
+        MyThread thread2 = new MyThread("Thread 2 - Processing");
+        MyThread thread3 = new MyThread("Thread 3 - Report Generation");
+
+        thread1.start();
+        thread1.join(); // Main thread wait karega jab tak Thread 1 complete nahi hota
+
+        thread2.start();
+        thread2.join(); // Thread 2 complete hone ka wait
+
+        thread3.start();
+        thread3.join(); // Thread 3 complete hone ka wait
+
+        System.out.println("All tasks completed! Main thread exiting.");
+    }
+}
+
+5. Output Example
+Thread 1 - Data Loading - step 1
+Thread 1 - Data Loading - step 2
+...
+Thread 1 - Data Loading completed!
+Thread 2 - Processing - step 1
+Thread 2 - Processing - step 2
+...
+Thread 2 - Processing completed!
+Thread 3 - Report Generation - step 1
+...
+Thread 3 - Report Generation completed!
+All tasks completed! Main thread exiting.
+
+6. Key Points
+
+join() ek thread ko wait karwata hai dusre thread ke khatam hone tak.
+
+Agar join(time) use kare, toh vo maximum utna hi wait karega.
+
+InterruptedException handle karna zaroori hai, kyunki thread wait ke beech interrupt ho sakta hai.
+
+7. Use Cases
+
+Sequential execution in multi-threading.
+
+Data dependency tasks – jaise file load hone ke baad hi processing karni ho.
+
+Task chaining – ek kaam complete hone ke baad hi next kaam start ho.
