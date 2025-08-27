@@ -1,1 +1,89 @@
+1. Interrupt hota kya hai?
+
+Interrupt ka matlab hota hai thread ko signal dena ki:
+
+“Bhai, ab apna kaam check kar, shayad rukna ya exit karna pade.”
+
+⚠️ Important:
+Interrupt thread ko zabardasti band nahi karta — thread khud decide karta hai ki kya karna hai.
+
+2. Interrupt kaise bhejte hain?
+
+Jis thread ko interrupt karna hai, uspe interrupt() call kar do:
+
+thread.interrupt();
+
+3. Thread kaise react karega?
+Case 1: Agar thread sleep() ya wait() jaise blocking method use kar raha hai
+
+Tab interrupt hone par InterruptedException throw hota hai:
+
+try {
+    Thread.sleep(4000);
+} catch (InterruptedException e) {
+    // Thread ko signal mila ki ruk ja
+    return; // thread exit
+}
+
+Case 2: Agar thread kaam me busy hai (long loop ya processing)
+
+Tab thread ko khud check karna padega:
+
+for (int i = 0; i < 1000; i++) {
+    System.out.println("Working..." + i);
+
+    if (Thread.interrupted()) {
+        System.out.println("Interrupt signal mila, thread exit ho raha hai...");
+        return;
+    }
+}
+
+4. Interrupt flag ka funda
+
+Jab hum interrupt() call karte hain:
+
+Ek flag set ho jata hai ki “thread ko signal mila hai.”
+
+Thread.interrupted() → flag check karega aur clear bhi kar dega.
+
+isInterrupted() → flag check karega but clear nahi karega.
+
+5. Yaad rakhne layak baatein
+
+Interrupt ka matlab force stop nahi hai, bas ek polite request hai.
+
+Agar thread ne signal ko check nahi kiya, toh wo chalta rahega.
+
+Best practice: hamesha loop ya blocking points par interrupt ko handle karo.
+
+Easy Example
+class MyThread extends Thread {
+    public void run() {
+        for (int i = 0; i < 10; i++) {
+            System.out.println("Working..." + i);
+
+            if (Thread.interrupted()) {
+                System.out.println("Interrupt mila, thread band ho raha hai...");
+                return;
+            }
+        }
+    }
+}
+
+public class InterruptDemo {
+    public static void main(String[] args) throws InterruptedException {
+        MyThread t1 = new MyThread();
+        t1.start();
+
+        Thread.sleep(20); // thoda wait
+        t1.interrupt();   // signal bhej do
+    }
+}
+
+
+Output:
+
+Working...0
+Working...1
+Interrupt mila, thread band ho raha hai...
 
